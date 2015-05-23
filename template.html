@@ -1,0 +1,60 @@
+<html>
+<head>
+<title>Hacker News Confidence &middot; elijames.org</title>
+  <meta content='A mirror of Hacker News, sorted according to quality.' name='description' />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+
+  <link href='normalize.css' type='text/css' rel='stylesheet' />
+  <link href='foundation.min.css' type='text/css' rel='stylesheet' />
+  <style>
+    header {
+      border-bottom: 1px solid #eee;
+    }
+
+    ol li.active {
+      color: #333;
+    }
+
+    ol li {
+      color: #888;
+    }
+
+    ol li:hover {
+      color: #333;
+    }
+
+    footer {
+      border-top: 1px solid #eee;
+    }
+
+    .meta { color: #999; }
+  </style>
+</head>
+<body>
+  <div class='row'>
+    <header class='small-12 columns'>
+      <h1 class='text-center'>Hacker News Confidence</h1>
+      <p class='text-center'>Less annoying hacker news. (<a href='#'>What is this?</a>)</p>
+    </header>
+  </div>
+  <div class='row'>
+    <div class='small-12 medium-10 medium-offset-1 columns'>
+      <ol>
+        {{ range $i, $n := .Items }}
+        <li {{ if lt $i 5 }}class='active'{{ end }}>
+          <a href="{{ .Link }}">{{ .Title }}</a> 
+          <span class='meta'>{{.Points}} upvotes, {{ .Comments }} comments</span>
+        </li>
+        {{ end }}
+      </ol>
+    </div>
+  </div>
+  <div class='row'>
+    <footer>
+      Last generated {{ .LastGen }}. Source <a href='https://github.com/ejamesc/go-hn-confidence'>here</a>.   
+    </footer>
+  </div>
+
+</body>
+</html>

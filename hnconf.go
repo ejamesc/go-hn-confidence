@@ -46,7 +46,7 @@ func (m Items) Less(i, j int) bool {
 	return m[i].Score() < m[j].Score()
 }
 
-func Load() ([]*NewsItem, error) {
+func Scrape() ([]*NewsItem, error) {
 	doc, err := goquery.NewDocument(ROOT_URL)
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func Load() ([]*NewsItem, error) {
 }
 
 func main() {
-	newsItems, err := Load()
+	newsItems, err := Scrape()
 	if err != nil {
 		fmt.Println(err)
 	}

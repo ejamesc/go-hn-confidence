@@ -12,8 +12,8 @@ import (
 )
 
 // Test Load function
-func TestLoad(t *testing.T) {
-	newsItems, err := main.Load()
+func TestScrape(t *testing.T) {
+	newsItems, err := main.Scrape()
 	ok(t, err)
 
 	for i, item := range newsItems {
