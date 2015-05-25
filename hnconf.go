@@ -2,21 +2,30 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"math"
+	"os"
+	"path"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/termie/go-shutil"
 )
 
-const ROOT_URL string = "https://news.ycombinator.com"
+const (
+	ROOT_URL   string = "https://news.ycombinator.com"
+	TARGET_DIR string = "/var/www/hn"
+)
 
 type NewsItem struct {
-	Title    string
-	Link     string
-	Points   int
-	Comments int
+	Title        string
+	Link         string
+	Points       int
+	Comments     int
+	CommentsLink string
 }
 
 func (ni *NewsItem) Score() float64 {
@@ -72,6 +81,12 @@ func Scrape() ([]*NewsItem, error) {
 	doc.Find(".subtext").Each(func(i int, s *goquery.Selection) {
 		pString := s.Find(".score").Text()
 		cString := s.Find("a").Last().Text()
+		cLink, exists := s.Find("a").Last().Attr("href")
+		if !exists {
+			cLink = ""
+		} else {
+			cLink = ROOT_URL + "/" + cLink
+		}
 		points := 0
 		comments := 0
 
@@ -94,6 +109,7 @@ func Scrape() ([]*NewsItem, error) {
 		item := res[i]
 		item.Points = points
 		item.Comments = comments
+		item.CommentsLink = cLink
 	})
 
 	sort.Sort(sort.Reverse(Items(res)))
@@ -106,7 +122,64 @@ func main() {
 		fmt.Println(err)
 	}
 
-	for _, item := range newsItems {
-		fmt.Printf("[%v] %v : %v - %v | %v\n", item.Score(), item.Points, item.Comments, item.Title, item.Link)
+	funcMap := template.FuncMap{
+		"fdate": DateFmt,
 	}
+
+	t := template.Must(template.New("template.html").Funcs(funcMap).ParseFiles("./template.html"))
+	filepath := path.Join(TARGET_DIR, "index.html")
+	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0755)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	presenter := struct {
+		Items   []*NewsItem
+		LastGen time.Time
+	}{newsItems, time.Now()}
+	err = t.Execute(file, presenter)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//extDir, _ := osext.ExecutableFolder()
+	staticPath := path.Join("./static")
+
+	// CopyTree demands that the destination folder not exist
+	// If it does, we delete it
+	outDir := path.Join(TARGET_DIR, "static")
+	_, err = os.Stat(outDir)
+	if err == nil {
+		err = os.RemoveAll(outDir)
+		if err != nil {
+			fmt.Println(err)
+		}
+	} else if err != nil && !os.IsNotExist(err) {
+		fmt.Println(err)
+	}
+
+	// CopyTree options:
+	// Symlinks - if true, symbolic links copied, if false symlinked files copied
+	// IgnoreDanglingSymlinks - supress error thrown when symlink links to missing file
+	// Optional CopyFunction
+	// Optional Ignore function
+	options := &shutil.CopyTreeOptions{
+		Symlinks:               false,
+		IgnoreDanglingSymlinks: true,
+		CopyFunction:           shutil.Copy,
+		Ignore:                 nil,
+	}
+	err = shutil.CopyTree(staticPath, outDir, options)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//for _, item := range newsItems {
+	//	fmt.Printf("[%v] %v : %v - %v | %v\n", item.Score(), item.Points, item.Comments, item.Title, item.Link)
+	//}
+}
+
+func DateFmt(tt time.Time) string {
+	const layout = "3:04pm, 2 January 2006"
+	return tt.Format(layout)
 }

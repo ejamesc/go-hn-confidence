@@ -4,12 +4,38 @@
   <meta content='A mirror of Hacker News, sorted according to quality.' name='description' />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="utf-8">
+  <link rel="apple-touch-icon" sizes="57x57" href="/static/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/static/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/static/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/static/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/static/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/static/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/static/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/static/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/static/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/static/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
 
-  <link href='normalize.css' type='text/css' rel='stylesheet' />
-  <link href='foundation.min.css' type='text/css' rel='stylesheet' />
+  <link href='/static/css/normalize.css' type='text/css' rel='stylesheet' />
+  <link href='/static/css/foundation.min.css' type='text/css' rel='stylesheet' />
   <style>
     header {
       border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+
+    header h1 {
+      text-shadow: 1px 1px 0 #FFFFFF, 2px 2px 0 #ff6600;
+    }
+
+    #explain {
+      display: none;
     }
 
     ol li.active {
@@ -24,27 +50,35 @@
       color: #333;
     }
 
+    .comments {
+      color: #999; !important
+    }
+
     footer {
       border-top: 1px solid #eee;
+      padding-top: 10px;
     }
 
     .meta { color: #999; }
   </style>
+
 </head>
 <body>
   <div class='row'>
     <header class='small-12 columns'>
       <h1 class='text-center'>Hacker News Confidence</h1>
-      <p class='text-center'>Less annoying hacker news. (<a href='#'>What is this?</a>)</p>
+      <p class='text-center'>Less annoying hacker news. (<a href='#' onclick="toggle('explain')">What is this?</a>)</p>
+      <p id='explain'>This site scrapes Hacker News once every 30 minutes, then sorts according to <a href="http://www.evanmiller.org/how-not-to-sort-by-average-rating.html">this formula</a>, with upvotes as positive signals and comments as negative ones. In my experience, the best articles to read on HN are the ones with a high upvote-to-discussion ratio. Mostly because controversial pieces tend to produce a disproportionate number of comments compared to upvotes.</p>
     </header>
   </div>
   <div class='row'>
     <div class='small-12 medium-10 medium-offset-1 columns'>
+      <br/>
       <ol>
         {{ range $i, $n := .Items }}
-        <li {{ if lt $i 5 }}class='active'{{ end }}>
+        <li {{ if lt $i 10 }}class='active'{{ end }}>
           <a href="{{ .Link }}">{{ .Title }}</a> 
-          <span class='meta'>{{.Points}} upvotes, {{ .Comments }} comments</span>
+          <span class='meta'>{{.Points}} upvotes, <a class="comments" href="{{ .CommentsLink }}">{{ .Comments }} comments</a></span>
         </li>
         {{ end }}
       </ol>
@@ -52,9 +86,19 @@
   </div>
   <div class='row'>
     <footer>
-      Last generated {{ .LastGen }}. Source <a href='https://github.com/ejamesc/go-hn-confidence'>here</a>.   
+      <p class='text-center'>Last generated {{ .LastGen | fdate }}. Source <a href='https://github.com/ejamesc/go-hn-confidence'>here</a>.</p> 
     </footer>
   </div>
 
 </body>
+<script type='text/javascript'>
+  function toggle(id) {
+    var el = document.getElementById(id);
+    if (el.style.display == "none" || el.style.display == "") {
+      el.style.display = "block";
+    } else {
+      el.style.display = "none";
+    }
+  }
+</script>
 </html>
