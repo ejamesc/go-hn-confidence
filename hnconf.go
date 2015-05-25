@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/kardianos/osext"
 	"github.com/termie/go-shutil"
 )
 
@@ -126,7 +127,9 @@ func main() {
 		"fdate": DateFmt,
 	}
 
-	t := template.Must(template.New("template.html").Funcs(funcMap).ParseFiles("./template.html"))
+	extDir, _ := osext.ExecutableFolder()
+	tmplPath := path.Join(extDir, "../src/github.com/ejamesc/go-hn-confidence", "template.html")
+	t := template.Must(template.New("template.html").Funcs(funcMap).ParseFiles(tmplPath))
 	filepath := path.Join(TARGET_DIR, "index.html")
 	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0755)
 	if err != nil {
@@ -142,8 +145,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	//extDir, _ := osext.ExecutableFolder()
-	staticPath := path.Join("./static")
+	staticPath := path.Join(extDir, "../src/github.com/ejamesc/go-hn-confidence", "static")
 
 	// CopyTree demands that the destination folder not exist
 	// If it does, we delete it
