@@ -173,12 +173,9 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	//for _, item := range newsItems {
-	//	fmt.Printf("[%v] %v : %v - %v | %v\n", item.Score(), item.Points, item.Comments, item.Title, item.Link)
-	//}
 }
 
+// Helpers
 func DateFmt(tt time.Time) string {
 	const layout = "3:04pm, 2 January 2006"
 	return tt.Format(layout)
