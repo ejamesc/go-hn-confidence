@@ -65,7 +65,11 @@ func Scrape() ([]*NewsItem, error) {
 	res := []*NewsItem{}
 
 	doc.Find(".athing").Each(func(i int, s *goquery.Selection) {
-		title := s.Find(".title a").Text()
+		title, err := s.Find(".title a").Html()
+		if err != nil {
+			fmt.Printf("error grabbing html: %s\n", err)
+			return
+		}
 		link, exists := s.Find(".title a").Attr("href")
 		if !exists {
 			link = ""
