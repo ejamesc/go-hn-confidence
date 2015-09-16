@@ -65,7 +65,13 @@ func Scrape() ([]*NewsItem, error) {
 	res := []*NewsItem{}
 
 	doc.Find(".athing").Each(func(i int, s *goquery.Selection) {
-		title, err := s.Find(".title a").Html()
+		el := s.Find(".title a")
+		// If there's more than one found, reduce it to the first element
+		if el.Size() > 1 {
+			el = el.Slice(0, 1)
+		}
+
+		title := el.Text()
 		if err != nil {
 			fmt.Printf("error grabbing html: %s\n", err)
 			return
