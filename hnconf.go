@@ -102,7 +102,7 @@ func Scrape() ([]*NewsItem, error) {
 		comments := 0
 
 		if pString != "" {
-			pSt := strings.Split(pString, " ")[0]
+			pSt := strings.Fields(pString)[0]
 			points, err = strconv.Atoi(pSt)
 			if err != nil {
 				points = 0
@@ -110,7 +110,7 @@ func Scrape() ([]*NewsItem, error) {
 		}
 
 		if cString != "" && cString != "discuss" {
-			cSt := strings.Split(cString, " ")[0]
+			cSt := strings.Fields(cString)[0]
 			comments, err = strconv.Atoi(cSt)
 			if err != nil {
 				comments = 0
