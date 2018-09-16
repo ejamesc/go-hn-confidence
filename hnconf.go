@@ -138,13 +138,21 @@ func main() {
 		"fdate": DateFmt,
 	}
 
-	//baseDir := "../src/github.com/ejamesc/go-hn-confidence"
-	baseDir := "../../../../../../../../Users/kvineet/git/go-hn-confidence"
+	baseDir := "../src/github.com/ejamesc/go-hn-confidence"
 	extDir, _ := osext.ExecutableFolder()
 	tmplPath := path.Join(extDir, baseDir, "template.html")
 	t := template.Must(template.New("template.html").Funcs(funcMap).ParseFiles(tmplPath))
 	filepath := path.Join(TARGET_DIR, "index.html")
 	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0755)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	presenter := struct {
+		Items   []*NewsItem
+		LastGen time.Time
+	}{newsItems, time.Now()}
+	err = t.Execute(file, presenter)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -156,15 +164,6 @@ func main() {
 	rssT := textTemplate.Must(textTemplate.New("templateRss.xml").Funcs(rssFuncMap).ParseFiles(rssTmplPath))
 	rssFilepath := path.Join(TARGET_DIR, "feed.xml")
 	rssFile, rssErr := os.OpenFile(rssFilepath, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0755)
-
-	presenter := struct {
-		Items   []*NewsItem
-		LastGen time.Time
-	}{newsItems, time.Now()}
-	err = t.Execute(file, presenter)
-	if err != nil {
-		fmt.Println(err)
-	}
 
 	rssErr = rssT.Execute(rssFile, presenter)
 	if rssErr != nil {
