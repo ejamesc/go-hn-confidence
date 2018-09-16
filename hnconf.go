@@ -207,22 +207,6 @@ func DateFmt(tt time.Time) string {
 	const layout = "3:04pm, 2 January 2006"
 	return tt.Format(layout)
 }
-		Symlinks:               false,
-		IgnoreDanglingSymlinks: true,
-		CopyFunction:           shutil.Copy,
-		Ignore:                 nil,
-	}
-	err = shutil.CopyTree(staticPath, outDir, options)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
-// Helpers
-func DateFmt(tt time.Time) string {
-	const layout = "3:04pm, 2 January 2006"
-	return tt.Format(layout)
-}
 
 // date following RFC-822
 func DateFmtRss(tt time.Time) string {
