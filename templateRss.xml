@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Hacker News Confidence - elijames.org</title>
+    <link>http://hn.elijames.org/</link>
+    <description>A mirror of Hacker News, sorted according to quality. Source at https://github.com/ejamesc/go-hn-confidence</description>
+    <lastBuildDate>{{ .LastGen | fdaterss }}</lastBuildDate>
+  
+    {{ range $i, $n := .Items }}
+      <item>
+        <title>{{ .Title }}</title>
+        <link>{{ .Link }}</link>
+        <description>{{.Points}} upvotes</description>  
+        <comments>{{ .CommentsLink }}</comments>
+      </item>
+    {{ end }}
+  </channel>
+</rss>

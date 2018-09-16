@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	textTemplate "text/template"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -137,14 +138,24 @@ func main() {
 		"fdate": DateFmt,
 	}
 
+	//baseDir := "../src/github.com/ejamesc/go-hn-confidence"
+	baseDir := "../../../../../../../../Users/kvineet/git/go-hn-confidence"
 	extDir, _ := osext.ExecutableFolder()
-	tmplPath := path.Join(extDir, "../src/github.com/ejamesc/go-hn-confidence", "template.html")
+	tmplPath := path.Join(extDir, baseDir, "template.html")
 	t := template.Must(template.New("template.html").Funcs(funcMap).ParseFiles(tmplPath))
 	filepath := path.Join(TARGET_DIR, "index.html")
 	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0755)
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	rssFuncMap := textTemplate.FuncMap{
+		"fdaterss": DateFmtRss,
+	}
+	rssTmplPath := path.Join(extDir, baseDir, "templateRss.xml")
+	rssT := textTemplate.Must(textTemplate.New("templateRss.xml").Funcs(rssFuncMap).ParseFiles(rssTmplPath))
+	rssFilepath := path.Join(TARGET_DIR, "feed.xml")
+	rssFile, rssErr := os.OpenFile(rssFilepath, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0755)
 
 	presenter := struct {
 		Items   []*NewsItem
@@ -155,7 +166,12 @@ func main() {
 		fmt.Println(err)
 	}
 
-	staticPath := path.Join(extDir, "../src/github.com/ejamesc/go-hn-confidence", "static")
+	rssErr = rssT.Execute(rssFile, presenter)
+	if rssErr != nil {
+		fmt.Println(rssErr)
+	}
+
+	staticPath := path.Join(extDir, baseDir, "static")
 
 	// CopyTree demands that the destination folder not exist
 	// If it does, we delete it
@@ -190,5 +206,27 @@ func main() {
 // Helpers
 func DateFmt(tt time.Time) string {
 	const layout = "3:04pm, 2 January 2006"
+	return tt.Format(layout)
+}
+		Symlinks:               false,
+		IgnoreDanglingSymlinks: true,
+		CopyFunction:           shutil.Copy,
+		Ignore:                 nil,
+	}
+	err = shutil.CopyTree(staticPath, outDir, options)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+// Helpers
+func DateFmt(tt time.Time) string {
+	const layout = "3:04pm, 2 January 2006"
+	return tt.Format(layout)
+}
+
+// date following RFC-822
+func DateFmtRss(tt time.Time) string {
+	const layout = "Mon, 02 Jan 2006 15:04:05 MST"
 	return tt.Format(layout)
 }
