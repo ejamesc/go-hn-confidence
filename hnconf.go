@@ -92,6 +92,7 @@ func Scrape() ([]*NewsItem, error) {
 	doc.Find(".subtext").Each(func(i int, s *goquery.Selection) {
 		pString := s.Find(".score").Text()
 		cString := s.Find("a").Last().Text()
+		cString = strings.TrimSpace(strings.Replace(cString, "|", "", -1))
 		cLink, exists := s.Find("a").Last().Attr("href")
 		if !exists {
 			cLink = ""
@@ -109,7 +110,7 @@ func Scrape() ([]*NewsItem, error) {
 			}
 		}
 
-		if cString != "" && cString != "discuss" {
+		if cString != "" && cString != "discuss" && cString != "hide" {
 			cSt := strings.Fields(cString)[0]
 			comments, err = strconv.Atoi(cSt)
 			if err != nil {
